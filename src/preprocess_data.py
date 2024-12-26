@@ -24,7 +24,7 @@ class CleanData:
             DataFrame: Pandas dataframe
         """
         try:
-            return self.data.drop(columns, axis=1, inplace=True)
+            return self.data.drop(columns, axis=1)
 
         except KeyError as e:
             print(f'The columns mantioned does not exist in the dataset {e}')
