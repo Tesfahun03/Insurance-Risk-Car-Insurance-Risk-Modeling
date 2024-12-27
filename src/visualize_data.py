@@ -34,6 +34,8 @@ class VisualizeData:
         plt.show()
 
     def visualize_claims_by_vehicle(self):
+        """_Bar chart for avg claims by vehicle type.
+        """
         grouped = self.data.groupby('VehicleType')[
             'TotalClaims'].mean().reset_index()
         grouped.plot(kind='bar', x='VehicleType', y='TotalClaims',
@@ -44,10 +46,16 @@ class VisualizeData:
         plt.show()
 
     def visualize_premium_to_claim_ratio_by_make(self):
+        """scatter plot for visualizing the ratio of premium by claim for vehicle make.
+        """
         self.data['Premium_to_claim_ratio'] = self.data['TotalPremium'] / \
             (self.data['TotalClaims'] + 1)
         sns.scatterplot(x='make', y='Premium_to_claim_ratio', data=self.data)
         plt.title('Premium-to-Claim Ratio by make')
+        plt.xticks(rotation=90, ha='right')
+
+    # Adjust layout to prevent overlap
+        plt.tight_layout()
         plt.ylabel('Premium-to-Claim Ratio')
         plt.xlabel('make')
         plt.show()

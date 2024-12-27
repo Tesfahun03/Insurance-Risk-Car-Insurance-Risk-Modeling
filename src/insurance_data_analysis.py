@@ -10,24 +10,33 @@ class InsuranceAnalysis:
     def claim_accros_bankand_acc(self):
         """generate descriptive analysis for the average claim accros each bank and account type.
         """
-        return self.data.groupby('Bank', 'AccountType').agg(
+        return self.data.groupby(['Bank', 'AccountType']).agg(
             avg_claim=('TotalClaims', 'mean'),
             count=('TotalClaims', 'size')
         ).reset_index()
 
     def claim_accros_covertpye(self):
+        """generate descriptive analysis for the average claim accroscover type.
+        Returns:
+            summary: 
+        """
         return self.data.groupby('CoverType')['TotalClaims'].mean().reset_index()
 
     def claim_accros_vehicle(self):
-        return self.data.groupby('VehicleType', 'Province').agg(
+        return self.data.groupby(['VehicleType', 'Province']).agg(
             avg_claim=('TotalClaims', 'mean'),
             avg_Premium=('TotalPremium', 'mean'),
             count=('TotalClaims', 'size')
         ).reset_index()
 
     def claim_by_gender_province(self):
-        return self.data.groupby(['Province', 'Gender']).agg(
-            Avg_Total_Claim=('TotalClaim', 'mean'),
+        """_summary_
+
+        Returns:
+            pandas dataframe: generate descriptive analysys for claim, premim accross gender and procince.
+        """
+        return self.data.groupby(['Province', 'Gender-2']).agg(
+            Avg_Total_Claim=('TotalClaims', 'mean'),
             Avg_Premium=('TotalPremium', 'mean'),
-            Count=('TotalClaim', 'size')
+            Count=('TotalClaims', 'size')
         ).reset_index()
