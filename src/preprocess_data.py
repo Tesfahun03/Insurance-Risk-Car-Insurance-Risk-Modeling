@@ -35,6 +35,17 @@ class CleanData:
 
 # df['Bank'].value_counts().plot(kind = 'barh')
 
+    def plot_hist(self, column):
+        """plot histogram for single series
+
+        Args:
+            column (pandas series): 
+
+        Returns:
+            matplotlib plot: 
+        """
+        return self.data[column].value_counts().plot(kind='hist')
+
     def plot_bar(self, column):
         """plot a bar chart for a column
 
@@ -45,3 +56,32 @@ class CleanData:
             plot:
         """
         return self.data[column].value_counts().plot(kind='barh', title=f'{column} frquency ', xlabel='Count', ylabel=f'{column}s')
+
+    def fill_na_mean(self, column):
+        """method to fill the missing value of a series with mean of that column
+
+        Args:
+            column (pd.series): 
+        """
+        try:
+            return self.data[column].fillna(
+                self.data[column].mean())
+
+        except Exception as e:
+            print(f'an error occured during filling values {e}')
+
+    def fillna(self, column, value):
+        """method to fill missing value of a column with specific value
+
+        Args:
+            column (pd series): pandas dataframe or series
+            value (any): value to fill the missing values
+        Returns:
+            DataFrame: Pandas dataframe
+        """
+        try:
+            return self.data[column].fillna(value)
+        except KeyError as e:
+            print(f'{column} name does not exist in df: {e}')
+        except Exception as e:
+            print(f'Error occured {e}')
