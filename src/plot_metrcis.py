@@ -23,6 +23,7 @@ class PlotMetrics:
         plt.title('comparison of MAE scores')
         plt.xticks(rotation=45)
         plt.show()
+        
 
         # plot for mean squared error
         plt.figure(figsize=(6, 4))
