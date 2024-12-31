@@ -29,7 +29,8 @@ class DataProcessing:
         Returns:
             _DataFrame_: _encoded dataframe_
         """
-        columns_label = self.data.select_dtypes(include=['object']).columns
+        columns_label = self.data.select_dtypes(
+            include=['object', 'bool']).columns
         df_lbl = self.data.copy()
         for col in columns_label:
             label = LabelEncoder()
@@ -47,7 +48,7 @@ class DataProcessing:
         Returns:
             _Pd.Dataframe_: _standardize dataframe_
         """
-        column_scaler = dataframe.select_dtype(
+        column_scaler = dataframe.select_dtypes(
             include=['object', 'float64', 'int64']).columns
         df_standard = dataframe.copy()
         standard = StandardScaler()

@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-import xgboost as xgb
-
+from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
@@ -59,7 +58,8 @@ class TrainData:
         Returns:
             RandomForestRegressor()_: _a Random Forest  model on the training data_
         """
-        random_forest_model = RandomForestRegressor(random_state=42)
+        random_forest_model = RandomForestRegressor(
+            n_estimators=100, n_jobs=-1)  # Use all CPU cores
         random_forest_model.fit(self.x_train, self.y_train)
         return random_forest_model
 
@@ -69,7 +69,7 @@ class TrainData:
         Returns:
             XGBOOST()_: _a XGBoost model on the training data_
         """
-        xg_model = xgb(random_state=42)
+        xg_model = XGBRegressor(random_state=42)
         xg_model.fit(self.x_train, self.y_train)
         return xg_model
 
@@ -77,7 +77,8 @@ class TrainData:
 class EvaluateModel:
     """_class for evualuating the accuracy of a given model_
     """
-    def evaluate_model(model, x_test, y_test):
+
+    def evaluate_model(self, model, x_test, y_test):
         """_evaluates the errors of the model using accuracy metrics_
 
         Args:
