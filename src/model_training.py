@@ -1,98 +1,119 @@
+import logging
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from typing import Tuple, Union
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/project.log"),
+        logging.StreamHandler()
+    ]
+)
 
 
-class SplitData:
-    def __init__(self, x, y):
+class DataSplitter:
+    """A class for splitting data into training and testing sets."""
+
+    def __init__(self, x: pd.DataFrame, y: pd.Series) -> None:
+        """Initialize with features and target."""
         self.x = x
         self.y = y
+        self.logger = logging.getLogger(self.__class__.__name__)
 
-    def split_data(self):
-        """_splits the data into 80% of training data and 20% of testing data_
+    def split_data(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+        """Split data into 80% training and 20% testing sets.
 
         Returns:
-            _train and test data_: _training and testing datas_
+            A tuple of (x_train, x_test, y_train, y_test).
         """
+        self.logger.info("Splitting data into train and test sets")
         return train_test_split(self.x, self.y, test_size=0.2, random_state=42)
 
 
-class TrainData:
-    """_a class for training multiple machine learning algorithm for the same training and testing sets._
-    """
+class ModelTrainer:
+    """A class for training multiple machine learning models."""
 
-    def __init__(self, x_train, y_train):
+    def __init__(self, x_train: pd.DataFrame, y_train: pd.Series) -> None:
+        """Initialize with training data."""
         self.x_train = x_train
         self.y_train = y_train
+        self.logger = logging.getLogger(self.__class__.__name__)
 
-    def linear_regression(self):
-        """_initialize the linear regression model and fit the training and testing set from the dataset_
-
-        Returns:
-            _LinearRegression()_: _a linear regression model on the training data_
-        """
-        linear_model = LinearRegression()
-        linear_model.fit(self.x_train, self.y_train)
-        return linear_model
-
-    def decision_tree_regressor(self):
-        """_initialize the decision tree regressor model and fit the training and testing set from the dataset_
+    def linear_regression(self) -> LinearRegression:
+        """Train a Linear Regression model.
 
         Returns:
-            _DesicionTreeeRegressor()_: _a decision regression model on the training data_
+            A fitted LinearRegression model.
         """
-        decision_tree_model = DecisionTreeRegressor(random_state=42)
-        decision_tree_model.fit(self.x_train, self.y_train)
-        return decision_tree_model
+        self.logger.info("Training Linear Regression model")
+        model = LinearRegression()
+        model.fit(self.x_train, self.y_train)
+        return model
 
-    def random_forest(self):
-        """_initialize the Random forest  model and fit the training and testing set from the dataset_
+    def decision_tree_regressor(self) -> DecisionTreeRegressor:
+        """Train a Decision Tree Regressor model.
 
         Returns:
-            RandomForestRegressor()_: _a Random Forest  model on the training data_
+            A fitted DecisionTreeRegressor model.
         """
-        random_forest_model = RandomForestRegressor(
-            n_estimators=100, n_jobs=-1)  # Use all CPU cores
-        random_forest_model.fit(self.x_train, self.y_train)
-        return random_forest_model
+        self.logger.info("Training Decision Tree Regressor model")
+        model = DecisionTreeRegressor(random_state=42)
+        model.fit(self.x_train, self.y_train)
+        return model
 
-    def xgboost(self):
-        """_initialize the XG BOOST model and fit the training and testing set from the dataset_
+    def random_forest(self) -> RandomForestRegressor:
+        """Train a Random Forest Regressor model.
 
         Returns:
-            XGBOOST()_: _a XGBoost model on the training data_
+            A fitted RandomForestRegressor model.
         """
-        xg_model = XGBRegressor(random_state=42)
-        xg_model.fit(self.x_train, self.y_train)
-        return xg_model
+        self.logger.info("Training Random Forest Regressor model")
+        model = RandomForestRegressor(n_estimators=100, n_jobs=-1)
+        model.fit(self.x_train, self.y_train)
+        return model
+
+    def xgboost(self) -> XGBRegressor:
+        """Train an XGBoost Regressor model.
+
+        Returns:
+            A fitted XGBRegressor model.
+        """
+        self.logger.info("Training XGBoost Regressor model")
+        model = XGBRegressor(random_state=42)
+        model.fit(self.x_train, self.y_train)
+        return model
 
 
-class EvaluateModel:
-    """_class for evualuating the accuracy of a given model_
-    """
+class ModelEvaluator:
+    """A class for evaluating machine learning model performance."""
 
-    def evaluate_model(self, model, x_test, y_test):
-        """_evaluates the errors of the model using accuracy metrics_
+    def __init__(self) -> None:
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def evaluate_model(self, model, x_test: pd.DataFrame, y_test: pd.Series) -> Tuple[float, float, float, np.ndarray]:
+        """Evaluate a model using accuracy metrics.
 
         Args:
-            model (_[LinearRegression, DecisionTreeRegressor, RandomForestRegressor, XGBOOST]_): _regression models to measure thier accuracy_
-            x_test (_pd.DataFrame_): _Pandas dataframe of testing data for the features columns_
-            y_test (_pd.DataFrame_): _pandas dataframe of testing data for the target column_
+            model: A trained regression model.
+            x_test: Testing features.
+            y_test: Testing target.
 
         Returns:
-            _Accuracy metrics_: _' '_
+            A tuple of (mae, mse, r2, y_pred).
         """
+        self.logger.info(f"Evaluating model: {model.__class__.__name__}")
         y_pred = model.predict(x_test)
-
         mae = mean_absolute_error(y_test, y_pred)
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-
+        self.logger.info(f"MAE: {mae}, MSE: {mse}, R2: {r2}")
         return mae, mse, r2, y_pred
