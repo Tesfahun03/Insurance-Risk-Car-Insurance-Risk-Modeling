@@ -1,42 +1,68 @@
+import logging
 import pandas as pd
 import numpy as np
-import matplotlib.pylab as plt
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/project.log"),
+        logging.StreamHandler()
+    ]
+)
 
-class InsuranceAnalysis:
-    def __init__(self, data):
+class InsuranceAnalyzer:
+    """A class for analyzing insurance data across various dimensions."""
+
+    def __init__(self, data: pd.DataFrame) -> None:
+        """Initialize with a pandas DataFrame."""
         self.data = data
+        self.logger = logging.getLogger(self.__class__.__name__)
 
-    def claim_accros_bankand_acc(self):
-        """generate descriptive analysis for the average claim accros each bank and account type.
+    def claims_across_bank_and_account(self) -> pd.DataFrame:
+        """Generate descriptive analysis for average claims across bank and account type.
+
+        Returns:
+            A pandas DataFrame with average claims and counts.
         """
+        self.logger.info("Analyzing claims across bank and account type")
         return self.data.groupby(['Bank', 'AccountType']).agg(
             avg_claim=('TotalClaims', 'mean'),
             count=('TotalClaims', 'size')
         ).reset_index()
 
-    def claim_accros_covertpye(self):
-        """generate descriptive analysis for the average claim accroscover type.
+    def claims_across_cover_type(self) -> pd.DataFrame:
+        """Generate descriptive analysis for average claims across cover type.
+
         Returns:
-            summary: 
+            A pandas DataFrame with average claims by cover type.
         """
+        self.logger.info("Analyzing claims across cover type")
         return self.data.groupby('CoverType')['TotalClaims'].mean().reset_index()
 
-    def claim_accros_vehicle(self):
+    def claims_across_vehicle(self) -> pd.DataFrame:
+        """Generate descriptive analysis for claims and premiums across vehicle type and province.
+
+        Returns:
+            A pandas DataFrame with average claims, premiums, and counts.
+        """
+        self.logger.info("Analyzing claims across vehicle type and province")
         return self.data.groupby(['VehicleType', 'Province']).agg(
             avg_claim=('TotalClaims', 'mean'),
-            avg_Premium=('TotalPremium', 'mean'),
+            avg_premium=('TotalPremium', 'mean'),
             count=('TotalClaims', 'size')
         ).reset_index()
 
-    def claim_by_gender_province(self):
-        """_summary_
+    def claims_by_gender_province(self) -> pd.DataFrame:
+        """Generate descriptive analysis for claims and premiums across gender and province.
 
         Returns:
-            pandas dataframe: generate descriptive analysys for claim, premim accross gender and procince.
+            A pandas DataFrame with average claims, premiums, and counts.
         """
+        self.logger.info("Analyzing claims by gender and province")
         return self.data.groupby(['Province', 'Gender-2']).agg(
-            Avg_Total_Claim=('TotalClaims', 'mean'),
-            Avg_Premium=('TotalPremium', 'mean'),
-            Count=('TotalClaims', 'size')
+            avg_total_claim=('TotalClaims', 'mean'),
+            avg_premium=('TotalPremium', 'mean'),
+            count=('TotalClaims', 'size')
         ).reset_index()
