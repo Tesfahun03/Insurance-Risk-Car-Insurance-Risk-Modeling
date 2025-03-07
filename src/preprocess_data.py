@@ -1,87 +1,108 @@
+import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("logs/project.log"),
+        logging.StreamHandler()
+    ]
+)
 
-class CleanData:
-    """Used in cleaning the data( droping columns, rows, filling NA values, droping NA values)
-       preparing the data for visualization and caluculation(converting datatypes of a specific column...)
+class DataCleaner:
+    """A class for cleaning and preparing data for analysis and visualization."""
 
-       arg:
-            data -> pandas DataFrame
-    """
-
-    def __init__(self, data):
+    def __init__(self, data: pd.DataFrame) -> None:
+        """Initialize with a pandas DataFrame."""
         self.data = data
+        self.logger = logging.getLogger(self.__class__.__name__)
 
-    def drop_multi_column(self, columns):
-        """droping multiple columns
+    def drop_multiple_columns(self, columns: list[str]) -> pd.DataFrame:
+        """Drop multiple columns from the DataFrame.
 
         Args:
-            columns (Pandas Series): a list of pandas series(columns)
+            columns: A list of column names to drop.
 
         Returns:
-            DataFrame: Pandas dataframe
+            A pandas DataFrame with specified columns dropped.
         """
+        self.logger.info(f"Dropping columns: {columns}")
         try:
             return self.data.drop(columns, axis=1)
-
         except KeyError as e:
-            print(f'The columns mantioned does not exist in the dataset {e}')
-
+            self.logger.error(f"Columns not found in dataset: {e}")
+            raise
         except Exception as e:
-            print(f'Unable to drop columns: {e}')
+            self.logger.error(f"Unable to drop columns: {e}")
+            raise
 
-
-# df['Bank'].value_counts().plot(kind = 'barh')
-
-    def plot_hist(self, column):
-        """plot histogram for single series
+    def plot_histogram(self, column: str) -> plt.Axes:
+        """Plot a histogram for a single column.
 
         Args:
-            column (pandas series): 
+            column: The name of the column to plot.
 
         Returns:
-            matplotlib plot: 
+            A matplotlib Axes object with the histogram.
         """
-        return self.data[column].value_counts().plot(kind='hist')
+        self.logger.info(f"Plotting histogram for column: {column}")
+        ax = self.data[column].value_counts().plot(kind='hist')
+        plt.title(f"{column} Histogram")
+        plt.xlabel("Value")
+        plt.ylabel("Frequency")
+        return ax
 
-    def plot_bar(self, column):
-        """plot a bar chart for a column
+    def plot_bar(self, column: str) -> plt.Axes:
+        """Plot a bar chart for a column.
 
         Args:
-            column (Series): pandas series
+            column: The name of the column to plot.
 
         Returns:
-            plot:
+            A matplotlib Axes object with the bar chart.
         """
-        return self.data[column].value_counts().plot(kind='barh', title=f'{column} frquency ', xlabel='Count', ylabel=f'{column}s')
+        self.logger.info(f"Plotting bar chart for column: {column}")
+        ax = self.data[column].value_counts().plot(
+            kind='barh', title=f"{column} Frequency", xlabel="Count", ylabel=f"{column}s"
+        )
+        return ax
 
-    def fill_na_mean(self, column):
-        """method to fill the missing value of a series with mean of that column
+    def fill_na_with_mean(self, column: str) -> pd.Series:
+        """Fill missing values in a column with the column's mean.
 
         Args:
-            column (pd.series): 
+            column: The name of the column to fill.
+
+        Returns:
+            A pandas Series with missing values filled.
         """
+        self.logger.info(f"Filling NA values in {column} with mean")
         try:
-            return self.data[column].fillna(
-                self.data[column].mean())
-
+            return self.data[column].fillna(self.data[column].mean())
         except Exception as e:
-            print(f'an error occured during filling values {e}')
+            self.logger.error(f"Error filling NA values in {column}: {e}")
+            raise
 
-    def fillna(self, column, value):
-        """method to fill missing value of a column with specific value
+    def fill_na_with_value(self, column: str, value: any) -> pd.Series:
+        """Fill missing values in a column with a specific value.
 
         Args:
-            column (pd series): pandas dataframe or series
-            value (any): value to fill the missing values
+            column: The name of the column to fill.
+            value: The value to fill missing entries with.
+
         Returns:
-            DataFrame: Pandas dataframe
+            A pandas Series with missing values filled.
         """
+        self.logger.info(f"Filling NA values in {column} with {value}")
         try:
             return self.data[column].fillna(value)
         except KeyError as e:
-            print(f'{column} name does not exist in df: {e}')
+            self.logger.error(f"Column {column} not found: {e}")
+            raise
         except Exception as e:
-            print(f'Error occured {e}')
+            self.logger.error(f"Error filling NA values in {column}: {e}")
+            raise
