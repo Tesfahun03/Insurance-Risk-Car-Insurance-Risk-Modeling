@@ -1,6 +1,6 @@
 import pytest
 import matplotlib.pyplot as plt
-from src.plot_metrcis import MetricsVisualizer
+from src.plot_metrics import MetricsVisualizer
 
 
 @pytest.fixture
