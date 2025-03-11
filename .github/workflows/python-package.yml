@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"  # Match your local Python version
+          python-version: "3.9"
 
       # Install dependencies
       - name: Install dependencies
@@ -25,12 +25,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pandas numpy scikit-learn xgboost matplotlib seaborn pytest-cov
 
+      # Create logs directory
+      - name: Create logs directory
+        run: mkdir -p logs
+
       # Run tests with pytest
       - name: Run tests
         run: |
-          pytest tests/ --verbose --cov=./ --cov-report=xml
+          pytest tests/ --verbose --cov=src/ --cov-report=xml
 
-      # Optional: Upload coverage report
+      # Upload coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
