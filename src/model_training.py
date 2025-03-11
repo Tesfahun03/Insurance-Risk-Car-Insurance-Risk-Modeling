@@ -4,9 +4,10 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-from xgboost import XGBRegressor
+from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from xgboost import XGBRegressor
 from typing import Tuple, Union
 
 # Configure logging
@@ -91,6 +92,29 @@ class ModelTrainer:
         model = XGBRegressor(random_state=42)
         model.fit(self.x_train, self.y_train)
         return model
+    
+
+    def tune_random_forest(self, param_grid: dict = None) -> RandomForestRegressor:
+        """Tune Random Forest hyperparameters using GridSearchCV.
+
+        Args:
+            param_grid: Dictionary of parameters to tune (default provided if None).
+
+        Returns:
+            A fitted RandomForestRegressor with the best parameters.
+        """
+        self.logger.info("Tuning Random Forest model")
+        if param_grid is None:
+            param_grid = {
+                'n_estimators': [50, 100, 200],
+                'max_depth': [None, 10, 20],
+                'min_samples_split': [2, 5]
+            }
+        rf = RandomForestRegressor(random_state=42, n_jobs=-1)
+        grid_search = GridSearchCV(rf, param_grid, cv=5, scoring='neg_mean_squared_error', n_jobs=-1)
+        grid_search.fit(self.x_train, self.y_train)
+        self.logger.info(f"Best parameters: {grid_search.best_params_}")
+        return grid_search.best_estimator_
 
 
 class ModelEvaluator:
