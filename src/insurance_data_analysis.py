@@ -12,8 +12,20 @@ logging.basicConfig(
     ]
 )
 
+
 class InsuranceAnalyzer:
     """A class for analyzing insurance data across various dimensions."""
+
+    def export_results(self, result: pd.DataFrame, filename: str) -> None:
+        """Export analysis results to a CSV file.
+
+        Args:
+            result: DataFrame containing analysis results.
+            filename: Name of the file to save (e.g., 'claims_by_bank.csv').
+        """
+        self.logger.info(f"Exporting results to {filename}")
+        result.to_csv(filename, index=False)
+        self.logger.info(f"Results successfully exported to {filename}")
 
     def __init__(self, data: pd.DataFrame) -> None:
         """Initialize with a pandas DataFrame."""
